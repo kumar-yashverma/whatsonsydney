@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sydney Events</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-image: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1950&q=80');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      color: #fff;
+    }
+
+    header {
+      position: relative;
+      background-color: rgba(0, 0, 0, 0.6);
+      color: white;
+      padding: 20px 20px 20px 100px;
+      text-align: center;
+    }
+
+    .header-thumbnail {
+      position: absolute;
+      top: 50%;
+      left: 20px;
+      transform: translateY(-50%);
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      border: 3px solid white;
+      object-fit: cover;
+      z-index: 2;
+    }
+
+    .filter-container {
+      text-align: center;
+      margin: 20px;
+      padding: 10px;
+      border-radius: 8px;
+      width: fit-content;
+      margin-left: auto;
+      margin-right: auto;
+      background-color: transparent;
+      color: white;
+    }
+
+    .event-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .event-card {
+      position: relative;
+      background-size: cover;
+      background-position: center;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      margin: 15px;
+      width: 352px;
+      min-height: 80px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.3s ease;
+    }
+
+    .event-card::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      z-index: 0;
+    }
+
+    .event-details {
+      padding: 16px;
+      flex: 1;
+      z-index: 1;
+      position: relative;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .event-details h3 {
+      margin-top: 0;
+    }
+
+    .event-card button {
+      background-color: #48D1CC;
+      color: white;
+      border: none;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .event-card button:hover {
+      background-color: #218838;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      width: 300px;
+      text-align: center;
+    }
+
+    .modal-content input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    .modal-content button {
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      padding: 10px;
+      width: 100%;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .modal-content button:hover {
+      background-color: #0056b3;
+    }
+
+    .about-section {
+      background-color: transparent;
+      padding: 40px 30px;
+      margin: 50px auto;
+      max-width: 900px;
+      text-align: left;
+      font-size: 16px;
+      line-height: 1.8;
+      color: transparent;
+      background-clip: text;
+      -webkit-background-clip: text;
+      background-image: linear-gradient(to right, #1e90ff, #000);
+    }
+
+    .about-section h2 {
+      margin-bottom: 20px;
+      font-size: 28px;
+      text-align: center;
+      color: transparent;
+      background-clip: text;
+      -webkit-background-clip: text;
+      background-image: linear-gradient(to right, #00bfff, #000);
+      text-shadow: none;
+    }
+
+    .about-section ul {
+      padding-left: 20px;
+    }
+
+    .about-section li {
+      margin-bottom: 15px;
+      list-style-type: disc;
+      font-weight: bold;
+      text-shadow: none;
+    }
+
+    footer {
+      background-color: #222;
+      color: white;
+      text-align: center;
+      padding: 15px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <img src="https://cdn-icons-png.flaticon.com/512/861/861060.png" alt="event icon" class="header-thumbnail" />
+    <h1>Event-O-Gram</h1>
+  </header>
+
+  <div class="filter-container">
+    <label for="filterDate"><strong>Filter by Date:</strong></label>
+    <input type="date" id="filterDate" onchange="filterByDate()" />
+  </div>
+
+  <div class="event-container" id="events"></div>
+
+  <div class="modal" id="emailModal">
+    <div class="modal-content">
+      <h3>Enter your email to get tickets</h3>
+      <input type="email" id="userEmail" placeholder="Your email" required />
+      <button onclick="submitEmail()">Submit</button>
+    </div>
+  </div>
+
+  <div class="about-section">
+    <h2>Explore the Magic of Sydney</h2>
+    <ul>
+      <li>Sydney offers a vibrant calendar of events year-round, celebrating art, music, food, and culture.</li>
+      <li>From Vivid Sydney's stunning light displays to Bondi's beachside winter festivities, there’s something for everyone.</li>
+      <li>The Sydney Film Festival brings global cinema to the Harbour City, with screenings at iconic venues.</li>
+      <li>Enjoy concerts, community events, and cultural festivals under the stars or along Sydney's world-famous coastline.</li>
+      <li>This page keeps you updated with top events and links to buy tickets effortlessly.</li>
+      <li>Live theater, Indigenous art exhibitions, and cultural celebrations showcase Australia's diversity.</li>
+      <li>Beachside gigs, food truck festivals, and twilight markets make evenings magical.</li>
+      <li>Families can enjoy kid-friendly fairs, open-air cinemas, and community park events year-round.</li>
+    </ul>
+  </div>
+
+  <footer>
+    Made by Jassy Gill | All rights reserved | Contact: +91 7417194245 | email: yash050527@tmu.ac.in
+  </footer>
+
+  <script>
+    const concertBg = 'https://images.unsplash.com/photo-1533134242443-d4fd215305ad?auto=format&fit=crop&w=800&q=60';
+    const beachBg = 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=60';
+
+    const allEvents = [
+      {
+        title: "Vivid Sydney",
+        date: "2025-06-05",
+        location: "Sydney CBD",
+        type: "concert",
+        ticketOptions: [{ label: "View Details", link: "https://www.vividsydney.com/" }]
+      },
+      {
+        title: "Sydney Film Festival",
+        date: "2025-06-10",
+        location: "Various Locations, Sydney",
+        type: "concert",
+        ticketOptions: [{ label: "Buy Tickets", link: "https://www.sff.org.au/" }]
+      },
+      {
+        title: "Bondi Winter Magic",
+        date: "2025-06-20",
+        location: "Bondi Beach",
+        type: "beach",
+        ticketOptions: [{ label: "Learn More", link: "https://www.bondiwintermagic.org.au/" }]
+      }
+    ];
+
+    const eventsContainer = document.getElementById("events");
+    const modal = document.getElementById("emailModal");
+    let redirectLink = "";
+
+    function renderEvents(events) {
+      eventsContainer.innerHTML = "";
+
+      if (events.length === 0) {
+        eventsContainer.innerHTML = "<p style='color:white;'>No events found for the selected date.</p>";
+        return;
+      }
+
+      events.forEach(event => {
+        const card = document.createElement("div");
+        card.className = "event-card";
+
+        const bgImage = event.type === "concert" ? concertBg : beachBg;
+        card.style.backgroundImage = `url('${bgImage}')`;
+
+        const ticketButtons = event.ticketOptions.map(option => `
+          <button onclick="openModal('${option.link}')">${option.label}</button>
+        `).join("");
+
+        card.innerHTML = `
+          <div class="event-details">
+            <h3>${event.title}</h3>
+            <p><strong>Date:</strong> ${event.date}</p>
+            <p><strong>Location:</strong> ${event.location}</p>
+            ${ticketButtons}
+          </div>
+        `;
+
+        eventsContainer.appendChild(card);
+      });
+    }
+
+    function filterByDate() {
+      const selectedDate = document.getElementById("filterDate").value;
+      if (!selectedDate) {
+        renderEvents(allEvents);
+        return;
+      }
+
+      const filteredEvents = allEvents.filter(event => event.date === selectedDate);
+      renderEvents(filteredEvents);
+    }
+
+    function openModal(link) {
+      redirectLink = link;
+      modal.style.display = "flex";
+    }
+
+    function submitEmail() {
+      const email = document.getElementById("userEmail").value;
+      if (email && validateEmail(email)) {
+        console.log("Email captured:", email);
+        modal.style.display = "none";
+        window.open(redirectLink, '_blank');
+      } else {
+        alert("Please enter a valid email address.");
+      }
+    }
+
+    function validateEmail(email) {
+      const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return re.test(email);
+    }
+
+    window.onclick = function(event) {
+      if (event.target === modal) {
+        modal.style.display = "none";
+      }
+    };
+
+    renderEvents(allEvents);
+  </script>
+
+</body>
+</html>
